@@ -1,0 +1,8 @@
+{
+  "name": "Remix CipherTalk",
+  "description": "End-to-end encrypted instant messaging app with real-time presence, status updates, and live audio/video calling.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

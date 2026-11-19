@@ -1,0 +1,299 @@
+{
+  "entities": {
+    "DirectoryUser": {
+      "title": "DirectoryUser",
+      "description": "Non-PII public directory entry containing user display profile, E2EE ECDH P-256 public key, and real-time presence/status.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID of the user." },
+        "displayName": { "type": "string", "description": "Public display name." },
+        "handle": { "type": "string", "description": "Public ToKer handle without PII." },
+        "photoUrl": { "type": "string", "description": "Optional avatar URL." },
+        "avatarBase64": { "type": "string", "description": "Optional gallery-picked JPEG Base64 display picture." },
+        "publicKey": { "type": "string", "description": "Base64 X.509 EC P-256 public key for ECDH key agreement." },
+        "keyFingerprint": { "type": "string", "description": "Short SHA-256 fingerprint of the public key." },
+        "presence": {
+          "type": "string",
+          "enum": ["ONLINE", "AWAY", "BUSY", "OFFLINE"],
+          "description": "Real-time availability status."
+        },
+        "statusMessage": { "type": "string", "description": "Real-time custom status message." },
+        "statusMood": { "type": "string", "description": "Mood or activity badge label." },
+        "discoverable": { "type": "boolean", "description": "Whether user appears in the discoverable directory." },
+        "lastSeenVisibility": { "type": "string", "enum": ["EVERYONE", "CONTACTS", "NOBODY"], "description": "Who can view last seen and presence." },
+        "photoVisibility": { "type": "string", "enum": ["EVERYONE", "CONTACTS", "NOBODY"], "description": "Who can view profile photo." },
+        "statusVisibility": { "type": "string", "enum": ["EVERYONE", "CONTACTS", "NOBODY"], "description": "Who can view live status and stories." },
+        "statusUpdatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of latest status update." },
+        "lastSeenAt": { "type": "string", "format": "date-time", "description": "Server timestamp of last activity." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["uid", "displayName", "handle", "publicKey", "keyFingerprint", "presence", "statusMessage", "statusMood", "discoverable", "statusUpdatedAt", "lastSeenAt", "createdAt", "updatedAt"]
+    },
+    "PrivateAccount": {
+      "title": "PrivateAccount",
+      "description": "Strictly owner-only PII and private security preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID." },
+        "email": { "type": "string", "description": "User email PII isolated from public directory." },
+        "phoneNumber": { "type": "string", "description": "Optional user mobile number PII isolated from public directory." },
+        "verifiedPeerIds": { "type": "array", "description": "Bounded list of peer UIDs whose safety numbers have been verified." },
+        "savedContactIds": { "type": "array", "description": "Bounded list of explicitly added/saved contact UIDs." },
+        "blockedUserIds": { "type": "array", "description": "Bounded list of blocked peer UIDs." },
+        "readReceiptsEnabled": { "type": "boolean", "description": "Whether read receipts are enabled." },
+        "lastSeenVisibility": { "type": "string", "enum": ["EVERYONE", "CONTACTS", "NOBODY"], "description": "Last seen audience control." },
+        "photoVisibility": { "type": "string", "enum": ["EVERYONE", "CONTACTS", "NOBODY"], "description": "Profile photo audience control." },
+        "statusVisibility": { "type": "string", "enum": ["EVERYONE", "CONTACTS", "NOBODY"], "description": "Status & story audience control." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["userId", "email", "verifiedPeerIds", "readReceiptsEnabled", "createdAt", "updatedAt"]
+    },
+    "StatusUpdate": {
+      "title": "StatusUpdate",
+      "description": "Real-time broadcast status update posted by a user.",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string", "description": "Author Firebase Auth UID." },
+        "authorName": { "type": "string", "description": "Author display name." },
+        "authorPhotoUrl": { "type": "string", "description": "Optional author avatar URL." },
+        "mood": { "type": "string", "description": "Status mood tag." },
+        "text": { "type": "string", "description": "Status update text (1..180 chars)." },
+        "visibility": { "type": "string", "enum": ["PUBLIC", "PRIVATE"], "description": "Visibility scope." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["authorId", "authorName", "mood", "text", "visibility", "createdAt", "updatedAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "End-to-end encrypted 1-to-1 conversation metadata.",
+      "type": "object",
+      "properties": {
+        "participantIds": { "type": "array", "description": "Sorted list of the 2 participant UIDs." },
+        "peerAId": { "type": "string", "description": "First participant UID." },
+        "peerAName": { "type": "string", "description": "First participant display name." },
+        "peerAPhotoUrl": { "type": "string", "description": "Optional first participant avatar URL." },
+        "peerBId": { "type": "string", "description": "Second participant UID." },
+        "peerBName": { "type": "string", "description": "Second participant display name." },
+        "peerBPhotoUrl": { "type": "string", "description": "Optional second participant avatar URL." },
+        "nicknames": { "type": "object", "description": "Optional per-UID custom display nickname for the chat." },
+        "pinnedMessageId": { "type": "string", "description": "Optional pinned message document ID." },
+        "pinnedBy": { "type": "string", "description": "Optional UID of participant who pinned the message." },
+        "lastMessageCiphertext": { "type": "string", "description": "Base64 AES-GCM ciphertext of latest message." },
+        "lastMessageIv": { "type": "string", "description": "Base64 12-byte GCM IV of latest message." },
+        "lastMessageSenderId": { "type": "string", "description": "UID of latest message sender." },
+        "lastMessageSenderPublicKey": { "type": "string", "description": "Sender X.509 public key used for latest message." },
+        "lastMessageAt": { "type": "string", "format": "date-time", "description": "Server timestamp of latest message." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["participantIds", "peerAId", "peerAName", "peerBId", "peerBName", "lastMessageCiphertext", "lastMessageIv", "lastMessageSenderId", "lastMessageSenderPublicKey", "lastMessageAt", "createdAt", "updatedAt"]
+    },
+    "EncryptedMessage": {
+      "title": "EncryptedMessage",
+      "description": "End-to-end encrypted message stored inside a conversation.",
+      "type": "object",
+      "properties": {
+        "conversationId": { "type": "string", "description": "Parent conversation ID." },
+        "participantIds": { "type": "array", "description": "Denormalized 2 participant UIDs for flat rule evaluation." },
+        "senderId": { "type": "string", "description": "Sender Firebase Auth UID." },
+        "senderPublicKey": { "type": "string", "description": "Base64 X.509 EC P-256 public key of sender." },
+        "ciphertext": { "type": "string", "description": "Base64 AES-256-GCM ciphertext." },
+        "iv": { "type": "string", "description": "Base64 12-byte GCM initialization vector." },
+        "encryptionAlg": { "type": "string", "enum": ["ECDH-P256-HKDF-AES256GCM"], "description": "Cryptographic suite identifier." },
+        "messageType": { "type": "string", "enum": ["TEXT", "CALL_LOG", "EMOJI", "IMAGE", "VIDEO", "LOCATION", "POLL", "STORY_MENTION", "DOCUMENT", "VOICE"], "description": "Message payload type." },
+        "readBy": { "type": "array", "description": "UIDs that have read this message (max 2)." },
+        "pollVotes": { "type": "object", "description": "Optional per-UID map of selected poll option index." },
+        "reactions": { "type": "object", "description": "Optional per-UID map of emoji reactions." },
+        "edited": { "type": "boolean", "description": "Optional flag indicating the sender edited this message." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["conversationId", "participantIds", "senderId", "senderPublicKey", "ciphertext", "iv", "encryptionAlg", "messageType", "readBy", "createdAt", "updatedAt"]
+    },
+    "TypingState": {
+      "title": "TypingState",
+      "description": "Real-time typing indicator for a participant in a conversation.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Typing participant UID." },
+        "participantIds": { "type": "array", "description": "Denormalized 2 participant UIDs." },
+        "typing": { "type": "boolean", "description": "Whether the user is currently typing." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp of typing state." }
+      },
+      "required": ["userId", "participantIds", "typing", "updatedAt"]
+    },
+    "CallSession": {
+      "title": "CallSession",
+      "description": "WebRTC audio/video call signaling session.",
+      "type": "object",
+      "properties": {
+        "callerId": { "type": "string", "description": "Caller Firebase Auth UID." },
+        "callerName": { "type": "string", "description": "Caller display name." },
+        "callerPhotoUrl": { "type": "string", "description": "Optional caller avatar URL." },
+        "calleeId": { "type": "string", "description": "Callee Firebase Auth UID." },
+        "calleeName": { "type": "string", "description": "Callee display name." },
+        "calleePhotoUrl": { "type": "string", "description": "Optional callee avatar URL." },
+        "participantIds": { "type": "array", "description": "List of callerId and calleeId." },
+        "callType": { "type": "string", "enum": ["AUDIO", "VIDEO"], "description": "Audio or video call." },
+        "status": { "type": "string", "enum": ["RINGING", "ACCEPTED", "CONNECTED", "DECLINED", "ENDED", "MISSED"], "description": "Current call state." },
+        "offerSdp": { "type": "string", "description": "WebRTC SDP Offer string." },
+        "answerSdp": { "type": "string", "description": "Optional WebRTC SDP Answer string." },
+        "e2eeFingerprint": { "type": "string", "description": "Call verification code derived from identity keys." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["callerId", "callerName", "calleeId", "calleeName", "participantIds", "callType", "status", "offerSdp", "e2eeFingerprint", "createdAt", "updatedAt"]
+    },
+    "IceCandidate": {
+      "title": "IceCandidate",
+      "description": "WebRTC ICE candidate exchanged via Firestore signaling.",
+      "type": "object",
+      "properties": {
+        "senderId": { "type": "string", "description": "Sender Firebase Auth UID." },
+        "participantIds": { "type": "array", "description": "Denormalized 2 participant UIDs." },
+        "sdpMid": { "type": "string", "description": "SDP media stream identification." },
+        "sdpMLineIndex": { "type": "integer", "description": "SDP media line index." },
+        "candidate": { "type": "string", "description": "ICE candidate string." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." }
+      },
+      "required": ["senderId", "participantIds", "sdpMid", "sdpMLineIndex", "candidate", "createdAt"]
+    },
+    "LiveStory": {
+      "title": "LiveStory",
+      "description": "WhatsApp-style ephemeral 24-hour live story (text gradient, photo, or video) with @mentions.",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string", "description": "Story creator UID." },
+        "authorName": { "type": "string", "description": "Creator display name." },
+        "authorPhotoUrl": { "type": "string", "description": "Optional creator avatar URL." },
+        "storyType": { "type": "string", "enum": ["TEXT", "PHOTO", "VIDEO"], "description": "Text, photo, or video story." },
+        "caption": { "type": "string", "description": "Story caption or text content." },
+        "gradientId": { "type": "string", "enum": ["EMERALD", "OCEAN", "SUNSET", "VIOLET", "OBSIDIAN"], "description": "Story background gradient." },
+        "imageBase64": { "type": "string", "description": "Optional compressed JPEG Base64 image or video poster thumbnail." },
+        "videoBase64": { "type": "string", "description": "Optional compressed MP4 Base64 video for video stories." },
+        "mentionedUserIds": { "type": "array", "description": "Optional list of UIDs mentioned in this story." },
+        "mentionedHandles": { "type": "array", "description": "Optional list of @handles mentioned in this story." },
+        "visibility": { "type": "string", "enum": ["PUBLIC"], "description": "Story visibility." },
+        "viewedBy": { "type": "array", "description": "UIDs who have viewed this story." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["authorId", "authorName", "storyType", "caption", "gradientId", "visibility", "viewedBy", "createdAt", "updatedAt"]
+    },
+    "GroupChat": {
+      "title": "GroupChat",
+      "description": "End-to-end encrypted multi-contact group chat metadata.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Group display name." },
+        "description": { "type": "string", "description": "Group description." },
+        "avatarBase64": { "type": "string", "description": "Optional gallery-picked JPEG Base64 group icon." },
+        "createdBy": { "type": "string", "description": "Creator Firebase Auth UID." },
+        "adminIds": { "type": "array", "description": "List of admin UIDs." },
+        "memberIds": { "type": "array", "description": "List of participant UIDs (2..50)." },
+        "memberJoinedAt": { "type": "object", "description": "Optional map of member UID to epoch-millis join timestamp for pre-join history isolation." },
+        "pinnedMessageId": { "type": "string", "description": "Optional pinned group message document ID." },
+        "pinnedBy": { "type": "string", "description": "Optional UID of member who pinned the message." },
+        "lastMessageCiphertext": { "type": "string", "description": "AES-256-GCM ciphertext of latest group message." },
+        "lastMessageIv": { "type": "string", "description": "Base64 12-byte GCM IV of latest group message." },
+        "lastMessageSenderId": { "type": "string", "description": "UID of latest group message sender." },
+        "lastMessageSenderName": { "type": "string", "description": "Display name of latest group message sender." },
+        "lastMessageAt": { "type": "string", "format": "date-time", "description": "Server timestamp of latest message." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["name", "description", "createdBy", "adminIds", "memberIds", "lastMessageCiphertext", "lastMessageIv", "lastMessageSenderId", "lastMessageSenderName", "lastMessageAt", "createdAt", "updatedAt"]
+    },
+    "GroupMemberKey": {
+      "title": "GroupMemberKey",
+      "description": "Per-member ECDH-wrapped 256-bit AES group secret key.",
+      "type": "object",
+      "properties": {
+        "memberId": { "type": "string", "description": "Target group member UID." },
+        "participantIds": { "type": "array", "description": "Denormalized group member UIDs." },
+        "granterId": { "type": "string", "description": "UID of member who wrapped the group key." },
+        "granterPublicKey": { "type": "string", "description": "ECDH P-256 public key of granter." },
+        "wrappedKeyCiphertext": { "type": "string", "description": "ECDH-encrypted AES-256 group key." },
+        "wrappedKeyIv": { "type": "string", "description": "Base64 12-byte GCM IV." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["memberId", "participantIds", "granterId", "granterPublicKey", "wrappedKeyCiphertext", "wrappedKeyIv", "createdAt", "updatedAt"]
+    },
+    "GroupMessage": {
+      "title": "GroupMessage",
+      "description": "AES-256-GCM encrypted message inside a group chat.",
+      "type": "object",
+      "properties": {
+        "groupId": { "type": "string", "description": "Parent group ID." },
+        "participantIds": { "type": "array", "description": "Denormalized member UIDs." },
+        "senderId": { "type": "string", "description": "Sender UID." },
+        "senderName": { "type": "string", "description": "Sender display name." },
+        "ciphertext": { "type": "string", "description": "Base64 AES-256-GCM ciphertext." },
+        "iv": { "type": "string", "description": "Base64 12-byte GCM IV." },
+        "encryptionAlg": { "type": "string", "enum": ["GROUP-AES256GCM"], "description": "Group cipher suite." },
+        "messageType": { "type": "string", "enum": ["TEXT", "CALL_LOG", "EMOJI", "IMAGE", "VIDEO", "LOCATION", "POLL", "STORY_MENTION", "DOCUMENT", "VOICE"], "description": "Message payload type." },
+        "readBy": { "type": "array", "description": "UIDs that have read this message." },
+        "pollVotes": { "type": "object", "description": "Optional per-UID map of selected poll option index." },
+        "reactions": { "type": "object", "description": "Optional per-UID map of emoji reactions." },
+        "edited": { "type": "boolean", "description": "Optional flag indicating the sender edited this message." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp on creation." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp on update." }
+      },
+      "required": ["groupId", "participantIds", "senderId", "senderName", "ciphertext", "iv", "encryptionAlg", "readBy", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/directory/{userId}": {
+      "schema": { "$ref": "#/entities/DirectoryUser" },
+      "description": "Non-PII public directory, E2EE public keys, and live presence/status."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": { "$ref": "#/entities/PrivateAccount" },
+      "description": "Owner-isolated PII and verified peer list."
+    },
+    "/status_updates/{statusId}": {
+      "schema": { "$ref": "#/entities/StatusUpdate" },
+      "description": "Real-time status feed updates."
+    },
+    "/stories/{storyId}": {
+      "schema": { "$ref": "#/entities/LiveStory" },
+      "description": "WhatsApp-style 24-hour live stories with viewer tracking."
+    },
+    "/conversations/{conversationId}": {
+      "schema": { "$ref": "#/entities/Conversation" },
+      "description": "1-to-1 encrypted conversation metadata."
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/EncryptedMessage" },
+      "description": "E2EE encrypted messages in a conversation."
+    },
+    "/conversations/{conversationId}/typing/{userId}": {
+      "schema": { "$ref": "#/entities/TypingState" },
+      "description": "Real-time typing indicator per participant."
+    },
+    "/groups/{groupId}": {
+      "schema": { "$ref": "#/entities/GroupChat" },
+      "description": "End-to-end encrypted multi-contact group chats."
+    },
+    "/groups/{groupId}/memberKeys/{memberId}": {
+      "schema": { "$ref": "#/entities/GroupMemberKey" },
+      "description": "Per-member ECDH-wrapped group secret keys."
+    },
+    "/groups/{groupId}/messages/{messageId}": {
+      "schema": { "$ref": "#/entities/GroupMessage" },
+      "description": "Encrypted group chat messages."
+    },
+    "/calls/{callId}": {
+      "schema": { "$ref": "#/entities/CallSession" },
+      "description": "Live WebRTC audio/video call signaling sessions."
+    },
+    "/calls/{callId}/candidates/{candidateId}": {
+      "schema": { "$ref": "#/entities/IceCandidate" },
+      "description": "WebRTC ICE candidates for call establishment."
+    }
+  }
+}
